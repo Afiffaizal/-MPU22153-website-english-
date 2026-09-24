@@ -1,0 +1,74 @@
+graph TB
+%% =======================================================
+%% Equipment Loan System - System Component Diagram
+%% MPU 22153 - Situation 04 - Group 04
+%% =======================================================
+
+%% Client & Actor Tier
+subgraph Clients["1. Client Tier (Web & Mobile Interface)"]
+    direction TB
+    Borrower["👨‍🎓 Borrower (Student/Staff)<br>• Check availability<br>• Submit reservation<br>• Hold QR Pass"]
+    Supervisor["👩‍🏫 Supervisor / Lecturer<br>• Review application<br>• Authorize / Decline"]
+    Officer["👨‍💼 Resource Centre Officer<br>• Scan QR at handover<br>• Inspect & photograph item<br>• Clear item on return"]
+    WebUI["💻 Responsive Web Portal (Vite / Vanilla JS)<br>• PWA Camera / QR Scanner<br>• Real-time Availability Catalog<br>• Loan Dashboard"]
+    
+    Borrower -->|Access & Reserve| WebUI
+    Supervisor -->|Review & Approve| WebUI
+    Officer -->|Scan & Verify| WebUI
+end
+
+%% Application Services Tier
+subgraph AppTier["2. Application & API Services Tier"]
+    direction TB
+    Gateway["🚪 API Gateway & Authentication<br>• Role-Based Access Control (RBAC)<br>• Rate Limiting & HTTPS Termination"]
+    LoanService["📋 Loan & Reservation Manager<br>• Booking conflict resolution<br>• Loan duration & overdue rules<br>• State machine coordinator"]
+    QREngine["🔲 QR Code Engine<br>• Cryptographic token generation<br>• One-time handover verification<br>• Tamper-proof validation"]
+    PhotoService["📷 Photo & Condition Audit Service<br>• Image compression & hashing<br>• Timestamp metadata<br>• Before/after diffing records"]
+    NotifyService["🔔 Notification & Reminder Engine<br>• Approval triggers<br>• 24h & 2h return reminders<br>• Overdue alert escalation"]
+
+    WebUI -->|REST / HTTPS Requests| Gateway
+    Gateway --> LoanService
+    LoanService -->|Request Token| QREngine
+    WebUI -.->|Upload Condition Photos| PhotoService
+    LoanService -->|Schedule Triggers| NotifyService
+end
+
+%% Data & Storage Tier
+subgraph DataTier["3. Data & Storage Tier"]
+    direction TB
+    subgraph Database["🗄️ Relational Database (SQL)"]
+        UsersTbl[("Users & Roles")]
+        EquipTbl[("Equipment Inventory<br>• Status: Available/Reserved/Loaned")]
+        LoansTbl[("Loan Transactions<br>• Borrower, dates, signatures")]
+        AuditTbl[("Audit Trail & Inspection Logs")]
+    end
+    
+    subgraph ObjectStorage["🗃️ Object / Cloud Storage"]
+        PhotosBucket[("Condition Photos<br>• Before-loan capture<br>• After-return capture")]
+        QRCache[("QR Asset Storage")]
+    end
+
+    LoanService -->|Read / Write records| Database
+    PhotoService -->|Store compressed photos| PhotosBucket
+    QREngine -->|Store token metadata| LoansTbl
+    PhotoService -.->|Link photo URLs & hashes| AuditTbl
+end
+
+%% External Integrations
+subgraph ExternalTier["4. External Communications"]
+    SMTP["✉️ Email / Notification Gateway<br>(Lecturer approvals & student reminders)"]
+    NotifyService -->|Dispatch alerts| SMTP
+    SMTP -.->|Send Email / Notification| Borrower
+    SMTP -.->|Send Approval Request| Supervisor
+end
+
+%% Styling classes
+classDef client fill:#f4f1e9,stroke:#2e5149,stroke-width:2px,color:#1f332c;
+classDef service fill:#eef4f1,stroke:#3b6a5e,stroke-width:2px,color:#183229;
+classDef data fill:#e8ede9,stroke:#52796f,stroke-width:2px,color:#1b2d26;
+classDef external fill:#fff7ed,stroke:#c2410c,stroke-width:2px,color:#7c2d12;
+
+class Borrower,Supervisor,Officer,WebUI client;
+class Gateway,LoanService,QREngine,PhotoService,NotifyService service;
+class UsersTbl,EquipTbl,LoansTbl,AuditTbl,PhotosBucket,QRCache data;
+class SMTP external;

@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Architecture & Component Diagram · Group 04</title>
+  <style>
+    :root {
+      --bg: #f4f1e9;
+      --paper-card: #fcfbf7;
+      --ink: #1f332c;
+      --ink-muted: #536b62;
+      --primary: #2e5149;
+      --primary-light: #e3ebe7;
+      --border: #d7ded8;
+      --accent: #b25829;
+      --accent-light: #fbeee7;
+      --radius: 8px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+      padding: 2rem 1.5rem;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    header.header {
+      margin-bottom: 2rem;
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .meta-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--primary);
+      background: var(--primary-light);
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 2.25rem;
+      color: var(--primary);
+      font-weight: 700;
+      line-height: 1.15;
+    }
+    .subtitle {
+      color: var(--ink-muted);
+      font-size: 1rem;
+      margin-top: 0.25rem;
+    }
+    .action-bar {
+      display: flex;
+      gap: 0.75rem;
+    }
+    button.btn {
+      background: var(--primary);
+      color: #fff;
+      border: 1px solid var(--primary);
+      padding: 0.6rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    button.btn:hover {
+      background: #233e38;
+    }
+    button.btn-secondary {
+      background: var(--paper-card);
+      color: var(--primary);
+      border: 1px solid var(--border);
+    }
+    button.btn-secondary:hover {
+      background: var(--primary-light);
+    }
+    
+    /* Layout grid */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    @media (max-width: 960px) {
+      .content-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Diagram Card */
+    .card {
+      background: var(--paper-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 2px 8px rgba(31, 51, 44, 0.05);
+      padding: 1.5rem;
+    }
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .pill {
+      font-size: 0.8rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: #fff;
+      cursor: pointer;
+      color: var(--ink-muted);
+      font-weight: 500;
+    }
+    .pill.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    /* Diagram viewport */
+    .diagram-viewport {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.5rem;
+      overflow-x: auto;
+      text-align: center;
+      min-height: 480px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .diagram-viewport svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Details Drawer / Sidebar */
+    .details-panel {
+      position: sticky;
+      top: 1.5rem;
+    }
+    .component-spec {
+      display: none;
+    }
+    .component-spec.active {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .spec-header {
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1rem;
+    }
+    .spec-tag {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      background: var(--accent-light);
+      padding: 0.2rem 0.5rem;
+      border-radius: 3px;
+      display: inline-block;
+      margin-bottom: 0.35rem;
+    }
+    .spec-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .spec-desc {
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      margin-bottom: 1rem;
+    }
+    .spec-section {
+      margin-bottom: 1rem;
+    }
+    .spec-section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 0.4rem;
+    }
+    .spec-list {
+      list-style: none;
+      font-size: 0.85rem;
+    }
+    .spec-list li {
+      padding: 0.35rem 0;
+      border-bottom: 1px dashed #e8ece9;
+      display: flex;
+      justify-content: space-between;
+    }
+    .spec-list li span.val {
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    /* Footer */
+    footer.doc-footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--ink-muted);
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <header class="header">
+    <div>
+      <span class="meta-badge">Archify-Diagrams · Technical Artifact</span>
+      <h1>System Component Architecture</h1>
+      <p class="subtitle">Resource Centre Equipment Loan System (MPU 22153 · Situation 04)</p>
+    </div>
+    <div class="action-bar">
+      <button class="btn btn-secondary" onclick="window.print()">Print / PDF</button>
+      <a class="btn" href="system-architecture.mmd" download="system-architecture.mmd">Download Mermaid (.mmd)</a>
+    </div>
+  </header>
+
+  <div class="content-grid">
+    <!-- Main Diagram View -->
+    <div class="card">
+      <div class="card-title">
+        <span>Component Topology & Data Flow</span>
+      </div>
+
+      <div class="filter-pills">
+        <button class="pill active" onclick="filterFlow('all', this)">All Components</button>
+        <button class="pill" onclick="filterFlow('booking', this)">1. Reservation Flow</button>
+        <button class="pill" onclick="filterFlow('handover', this)">2. QR & Photo Handover</button>
+        <button class="pill" onclick="filterFlow('return', this)">3. Return & Inspection</button>
+      </div>
+
+      <div class="diagram-viewport" id="diagram-container">
+        <pre class="mermaid" id="mermaid-code">
+graph TB
+subgraph Clients["1. Client Tier (Web & Mobile Interface)"]
+    direction TB
+    Borrower["👨‍🎓 Borrower (Student/Staff)<br>• Check availability<br>• Submit reservation<br>• Hold QR Pass"]
+    Supervisor["👩‍🏫 Supervisor / Lecturer<br>• Review application<br>• Authorize / Decline"]
+    Officer["👨‍💼 Resource Centre Officer<br>• Scan QR at handover<br>• Inspect & photograph item<br>• Clear item on return"]
+    WebUI["💻 Responsive Web Portal (Vite / Vanilla JS)<br>• PWA Camera / QR Scanner<br>• Real-time Availability Catalog<br>• Loan Dashboard"]
+    
+    Borrower -->|Access & Reserve| WebUI
+    Supervisor -->|Review & Approve| WebUI
+    Officer -->|Scan & Verify| WebUI
+end
+
+subgraph AppTier["2. Application & API Services Tier"]
+    direction TB
+    Gateway["🚪 API Gateway & Authentication<br>• Role-Based Access Control (RBAC)<br>• Rate Limiting & HTTPS Termination"]
+    LoanService["📋 Loan & Reservation Manager<br>• Booking conflict resolution<br>• Loan duration & overdue rules<br>• State machine coordinator"]
+    QREngine["🔲 QR Code Engine<br>• Cryptographic token generation<br>• One-time handover verification<br>• Tamper-proof validation"]
+    PhotoService["📷 Photo & Condition Audit Service<br>• Image compression & hashing<br>• Timestamp metadata<br>• Before/after diffing records"]
+    NotifyService["🔔 Notification & Reminder Engine<br>• Approval triggers<br>• 24h & 2h return reminders<br>• Overdue alert escalation"]
+
+    WebUI -->|REST / HTTPS Requests| Gateway
+    Gateway --> LoanService
+    LoanService -->|Request Token| QREngine
+    WebUI -.->|Upload Condition Photos| PhotoService
+    LoanService -->|Schedule Triggers| NotifyService
+end
+
+subgraph DataTier["3. Data & Storage Tier"]
+    direction TB
+    subgraph Database["🗄️ Relational Database (SQL)"]
+        UsersTbl[("Users & Roles")]
+        EquipTbl[("Equipment Inventory<br>• Status: Available/Reserved/Loaned")]
+        LoansTbl[("Loan Transactions<br>• Borrower, dates, signatures")]
+        AuditTbl[("Audit Trail & Inspection Logs")]
+    end
+    
+    subgraph ObjectStorage["🗃️ Object / Cloud Storage"]
+        PhotosBucket[("Condition Photos<br>• Before-loan capture<br>• After-return capture")]
+        QRCache[("QR Asset Storage")]
+    end
+
+    LoanService -->|Read / Write records| Database
+    PhotoService -->|Store compressed photos| PhotosBucket
+    QREngine -->|Store token metadata| LoansTbl
+    PhotoService -.->|Link photo URLs & hashes| AuditTbl
+end
+
+subgraph ExternalTier["4. External Communications"]
+    SMTP["✉️ Email / Notification Gateway<br>(Lecturer approvals & student reminders)"]
+    NotifyService -->|Dispatch alerts| SMTP
+    SMTP -.->|Send Email / Notification| Borrower
+    SMTP -.->|Send Approval Request| Supervisor
+end
+
+classDef client fill:#f4f1e9,stroke:#2e5149,stroke-width:2px,color:#1f332c;
+classDef service fill:#eef4f1,stroke:#3b6a5e,stroke-width:2px,color:#183229;
+classDef data fill:#e8ede9,stroke:#52796f,stroke-width:2px,color:#1b2d26;
+classDef external fill:#fff7ed,stroke:#c2410c,stroke-width:2px,color:#7c2d12;
+
+class Borrower,Supervisor,Officer,WebUI client;
+class Gateway,LoanService,QREngine,PhotoService,NotifyService service;
+class UsersTbl,EquipTbl,LoansTbl,AuditTbl,PhotosBucket,QRCache data;
+class SMTP external;
+        </pre>
+      </div>
+    </div>
+
+    <!-- Inspector Sidebar -->
+    <div class="card details-panel">
+      <div class="card-title">
+        <span>Component Inspector</span>
+      </div>
+
+      <div id="spec-default" class="component-spec active">
+        <div class="spec-header">
+          <span class="spec-tag">System Overview</span>
+          <h2 class="spec-title">Proposed Architecture</h2>
+        </div>
+        <p class="spec-desc">The digital equipment loan system replaces physical record books with a verifiable, multi-tiered digital architecture.</p>
+        <div class="spec-section">
+          <div class="spec-section-label">Key Pillars</div>
+          <ul class="spec-list">
+            <li><span>Frontend</span> <span class="val">PWA Web Portal</span></li>
+            <li><span>Verification</span> <span class="val">Cryptographic QR</span></li>
+            <li><span>Evidence</span> <span class="val">Condition Photos</span></li>
+            <li><span>Notifications</span> <span class="val">Automated Reminders</span></li>
+          </ul>
+        </div>
+        <div class="spec-section">
+          <div class="spec-section-label">Select a component</div>
+          <p style="font-size:0.85rem; color:var(--ink-muted);">Click on any component button below to inspect its technical role.</p>
+          <div style="display:flex; flex-direction:column; gap:0.4rem; margin-top:0.75rem;">
+            <button class="btn btn-secondary" onclick="showSpec('qr')">🔲 QR Code Engine</button>
+            <button class="btn btn-secondary" onclick="showSpec('photo')">📷 Photo Audit Service</button>
+            <button class="btn btn-secondary" onclick="showSpec('loan')">📋 Loan & Reservation Manager</button>
+            <button class="btn btn-secondary" onclick="showSpec('db')">🗄️ Database & Storage Tier</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="spec-qr" class="component-spec">
+        <div class="spec-header">
+          <span class="spec-tag">Core Engine</span>
+          <h2 class="spec-title">QR Code Engine</h2>
+        </div>
+        <p class="spec-desc">Generates secure, temporary QR tokens upon supervisor approval to verify collection and return.</p>
+        <div class="spec-section">
+          <div class="spec-section-label">Technical Responsibilities</div>
+          <ul class="spec-list">
+            <li><span>Format</span> <span class="val">Encrypted Payload</span></li>
+            <li><span>Validity</span> <span class="val">Scheduled Loan Window</span></li>
+            <li><span>Scan Mechanism</span> <span class="val">Single-use Handshake</span></li>
+            <li><span>Prevention</span> <span class="val">Anti-Screenshot Token</span></li>
+          </ul>
+        </div>
+        <button class="btn btn-secondary" onclick="showSpec('default')">← Back to Overview</button>
+      </div>
+
+      <div id="spec-photo" class="component-spec">
+        <div class="spec-header">
+          <span class="spec-tag">Evidence & Audit</span>
+          <h2 class="spec-title">Photo Audit Service</h2>
+        </div>
+        <p class="spec-desc">Solves the problem of unrecorded damage and disputes between borrowers and resource officers.</p>
+        <div class="spec-section">
+          <div class="spec-section-label">Technical Responsibilities</div>
+          <ul class="spec-list">
+            <li><span>Before Loan</span> <span class="val">Mandatory capture at handover</span></li>
+            <li><span>After Return</span> <span class="val">Comparison scan by officer</span></li>
+            <li><span>Compression</span> <span class="val">WebP / Client-side downsample</span></li>
+            <li><span>Metadata</span> <span class="val">ISO timestamp + Officer ID</span></li>
+          </ul>
+        </div>
+        <button class="btn btn-secondary" onclick="showSpec('default')">← Back to Overview</button>
+      </div>
+
+      <div id="spec-loan" class="component-spec">
+        <div class="spec-header">
+          <span class="spec-tag">Business Logic</span>
+          <h2 class="spec-title">Loan Manager</h2>
+        </div>
+        <p class="spec-desc">Orchestrates loan lifecycle states: Requested → Approved → Active / On Loan → Returned → Cleared.</p>
+        <div class="spec-section">
+          <div class="spec-section-label">Key Rules</div>
+          <ul class="spec-list">
+            <li><span>Conflict Check</span> <span class="val">Zero double-booking</span></li>
+            <li><span>Approval Gate</span> <span class="val">Lecturer sign-off required</span></li>
+            <li><span>Overdue Tracker</span> <span class="val">Auto-flag late items</span></li>
+          </ul>
+        </div>
+        <button class="btn btn-secondary" onclick="showSpec('default')">← Back to Overview</button>
+      </div>
+
+      <div id="spec-db" class="component-spec">
+        <div class="spec-header">
+          <span class="spec-tag">Persistence</span>
+          <h2 class="spec-title">Data & Storage Tier</h2>
+        </div>
+        <p class="spec-desc">Dual storage architecture: Relational SQL for atomic transactions; Object Store for visual photo evidence.</p>
+        <div class="spec-section">
+          <div class="spec-section-label">Entities</div>
+          <ul class="spec-list">
+            <li><span>Equipment</span> <span class="val">Serial, Status, Model</span></li>
+            <li><span>Transactions</span> <span class="val">Borrower, Supervisor, Dates</span></li>
+            <li><span>Photos Bucket</span> <span class="val">Audit images indexed by LoanID</span></li>
+          </ul>
+        </div>
+        <button class="btn btn-secondary" onclick="showSpec('default')">← Back to Overview</button>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="doc-footer">
+    <span>MPU 22153 (English for Technical Purposes) · Situation 04</span>
+    <span>Prepared with <strong>Archify-Diagrams</strong> for Group 04</span>
+  </footer>
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    themeVariables: {
+      primaryColor: '#eef4f1',
+      primaryTextColor: '#183229',
+      primaryBorderColor: '#3b6a5e',
+      lineColor: '#2e5149',
+      secondaryColor: '#f4f1e9',
+      tertiaryColor: '#e8ede9'
+    }
+  });
+
+  function showSpec(id) {
+    document.querySelectorAll('.component-spec').forEach(el => el.classList.remove('active'));
+    const target = document.getElementById('spec-' + id);
+    if (target) target.classList.add('active');
+  }
+
+  function filterFlow(type, btn) {
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    
+    // Highlight relevant inspector spec
+    if (type === 'booking') showSpec('loan');
+    else if (type === 'handover') showSpec('qr');
+    else if (type === 'return') showSpec('photo');
+    else showSpec('default');
+  }
+</script>
+</body>
+</html>
