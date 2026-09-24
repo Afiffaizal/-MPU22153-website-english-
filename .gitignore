@@ -1,0 +1,30 @@
+# Private personal state. Team roster in .Mcore/team.json is shared.
+/.Mcore/state.json
+/.Mcore/state.json.tmp
+/.Mcore/team.json.tmp
+/.Mcore/.lock
+/.Mcore/.login.json
+/.Mcore/.login.json.tmp
+/.Mcore/.vault-key.dpapi
+/.Mcore/.runtime/
+/.Mcore/users/
+.env
+.env.*
+!.env.example
+
+# Provider-generated project files are never part of MemoryCore.
+/.claude/
+/.codex/
+/.agents/
+/.qwen/
+/.gemini/
+/.cursor/
+/CLAUDE.md
+/QWEN.md
+
+# Local and generated files
+[Tt]emp/
+*.exe
+node_modules/
+dist/
+original-site.html

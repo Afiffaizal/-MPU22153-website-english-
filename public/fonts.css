@@ -1,0 +1,5 @@
+/* System font fallbacks remain readable without a network connection. */
+@font-face{font-family:'Study Serif';src:url('./assets/cormorant-garamond-latin-400-normal.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:'Study Serif';src:url('./assets/cormorant-garamond-latin-400-italic.woff2') format('woff2');font-style:italic;font-weight:400;font-display:swap}
+@font-face{font-family:'Study Sans';src:url('./assets/dm-sans-latin-400-normal.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:'Study Sans';src:url('./assets/dm-sans-latin-600-normal.woff2') format('woff2');font-style:normal;font-weight:600;font-display:swap}
